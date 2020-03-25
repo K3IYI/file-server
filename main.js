@@ -3,6 +3,8 @@ import multer, { diskStorage, MulterError } from "multer";
 import cors from "cors";
 import path from "path";
 import fs from "fs-extra";
+import formidable from "formidable";
+import concat from "concat-files";
 
 const app = express();
 
@@ -33,7 +35,7 @@ app.use(cors());
 //#endregion
 
 //#region large file multipart upload with merge
-const uploadDir = "public";
+const uploadDir = path.resolve(__dirname, "public");
 
 // 检查文件的MD5
 app.get("/check/file", (req, resp) => {
@@ -48,29 +50,6 @@ app.get("/check/file", (req, resp) => {
       resp.send(data);
     }
   );
-});
-
-// 检查chunk的MD5
-app.get("/check/chunk", (req, resp) => {
-  let query = req.query;
-  let chunkIndex = query.index;
-  let md5 = query.md5;
-
-  fs.stat(path.join(uploadDir, md5, chunkIndex), (err, stats) => {
-    if (stats) {
-      resp.send({
-        stat: 1,
-        exit: true,
-        desc: "Exit 1"
-      });
-    } else {
-      resp.send({
-        stat: 1,
-        exit: false,
-        desc: "Exit 0"
-      });
-    }
-  });
 });
 
 // 获取文件Chunk列表
@@ -131,6 +110,91 @@ function listDir(path) {
       }
       resolve(data);
     });
+  });
+}
+
+app.all("/upload", (req, resp) => {
+  const form = new formidable.IncomingForm({
+    uploadDir: path.resolve(uploadDir, "tmp")
+  });
+  form.parse(req, function(err, fields, file) {
+    let chunkIndex = fields.chunkIndex;
+    let fileMD5Value = fields.fileMD5Value;
+    let folder = path.resolve(__dirname, "public", fileMD5Value);
+    folderIsExist(folder).then(resolve => {
+      let destFile = path.resolve(folder, chunkIndex);
+      console.log("----------->", file.data.path, destFile);
+      copyFile(file.data.path, destFile).then(
+        successLog => {
+          console.log(successLog);
+          resp.send({
+            stat: 1,
+            desc: chunkIndex
+          });
+        },
+        errorLog => {
+          console.log(errorLog);
+          resp.send({
+            stat: 0,
+            desc: "Error"
+          });
+        }
+      );
+    });
+  });
+  // 文件夹是否存在, 不存在则创建文件
+  function folderIsExist(folder) {
+    console.log("folderIsExist", folder);
+    return new Promise((resolve, reject) => {
+      fs.ensureDirSync(path.join(folder));
+      console.log("result----", folder);
+      resolve("folder created");
+    });
+  }
+  // 把文件从一个目录拷贝到别一个目录
+  function copyFile(src, dest) {
+    let promise = new Promise((resolve, reject) => {
+      fs.rename(src, dest, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve("copy file:" + dest + " success!");
+        }
+      });
+    });
+    return promise;
+  }
+});
+
+app.all("/merge", async (req, resp) => {
+  let query = req.query;
+  let fileMD5Value = query.fileMD5Value;
+  let fileName = query.fileName;
+  console.log(fileMD5Value, fileName);
+  mergeFiles(path.resolve(uploadDir, fileMD5Value), uploadDir, fileName);
+  resp.send({
+    stat: 1
+  });
+});
+
+// 合并文件
+async function mergeFiles(srcDir, targetDir, newFileName) {
+  console.log(...arguments);
+  fs.createWriteStream(path.resolve(targetDir, newFileName));
+  let fileArr = await listDir(srcDir);
+  fileArr.sort((x, y) => {
+    return x - y;
+  });
+  // 把文件名加上文件夹的前缀
+  for (let i = 0; i < fileArr.length; i++) {
+    fileArr[i] = path.resolve(srcDir, fileArr[i]);
+  }
+  console.log(fileArr);
+  concat(fileArr, path.resolve(targetDir, newFileName), err => {
+    if (err) {
+      console.log(err);
+    }
+    console.log("Merge Success!");
   });
 }
 //#endregion
