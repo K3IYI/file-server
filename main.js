@@ -6,7 +6,7 @@ import {
   mergeFiles
 } from "./upload/upload";
 import { upload, MulterError } from "./upload/simple-upload";
-.
+
 //lib
 import express from "express";
 import cors from "cors";
