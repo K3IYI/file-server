@@ -1,5 +1,6 @@
 # Node-File-Server
 
-Node server for file upload, accept as FormData from frontend
-<br />-small file as single file
-<br />-large file as many parts and merge accordingly
+A test node server for browser file upload, receive as FormData.
+
+- Receive small file as single file.
+- Receive large file as multiple parts and merge accordingly.
