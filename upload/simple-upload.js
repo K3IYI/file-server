@@ -15,3 +15,4 @@ const storage = diskStorage({
 const upload = multer({ storage: storage }).array("data");
 
 export { upload, MulterError };
+.

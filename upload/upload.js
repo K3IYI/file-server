@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs-extra";
 import CombinedStream from "combined-stream";
 // import concat from "concat-files";
-
+.
 export const uploadDir = path.resolve(__dirname, "../public");
 
 //check the file in disk
