@@ -11,7 +11,7 @@
   "author": "Kei",
   "license": "ISC",
   "dependencies": {
-    "concat-files": "^0.1.1",
+    "combined-stream": "^1.0.8",
     "cors": "^2.8.5",
     "esm": "^3.2.25",
     "express": "^4.17.1",
