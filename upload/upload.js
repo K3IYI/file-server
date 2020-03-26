@@ -112,7 +112,7 @@ export const mergeFiles = async (fileMD5Value, newFileName) => {
   for (let i = 0; i < chunksArr.length; i++) {
     //add path directory for each chunk in array, so can be used as path
     chunksArr[i] = path.resolve(srcDir, chunksArr[i]);
-    combinedStream.append(function(next) {
+    combinedStream.append(next => {
       next(fs.createReadStream(chunksArr[i]));
     });
   }

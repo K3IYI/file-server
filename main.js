@@ -30,9 +30,8 @@ app.get("/check/file", (req, resp) => {
   });
 });
 
-//api for simple upload, no merge needed
-//does not work with large file
-app.post("/upload/simple", (req, res) => {
+//api for upload using multer, no merge needed
+app.post("/upload/multer", (req, res) => {
   upload(req, res, err => {
     if (err instanceof MulterError) {
       return res.status(500).json(err);
@@ -43,7 +42,7 @@ app.post("/upload/simple", (req, res) => {
   });
 });
 
-//api for upload, works with both large and small files
+//api for upload with custom function
 //needs to call merge api after files being uploaded
 app.post("/upload", (req, resp) => {
   //create a temporary directory to store uploaded file
