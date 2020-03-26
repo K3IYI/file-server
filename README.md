@@ -2,5 +2,7 @@
 
 A simple Node.JS test server for browser file upload.
 
-- Simple upload which works with small file.
-- Upload for large file, receive as multiple parts and merge accordingly.
+- Check is file exist in server with api: `/check/file`.
+- Simple upload as one file, api: `/upload/simple` (do not need to call for merge api).
+- Upload individual file chunks, api: `/upload`.
+- Merge file chunks into file, api: `/merge`.
