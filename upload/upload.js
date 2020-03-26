@@ -7,7 +7,7 @@ import CombinedStream from "combined-stream";
 export const uploadDir = path.resolve(__dirname, "../public");
 
 //check the file in disk
-export const isFileUploaded = async (fileName, fileMd5Value, callback) => {
+export const isFileUploaded = async (fileName, fileMd5Value, cb) => {
   const filePath = path.resolve(uploadDir, fileName);
   const folderPath = path.resolve(uploadDir, fileMd5Value);
   //check is file exist
@@ -35,7 +35,7 @@ export const isFileUploaded = async (fileName, fileMd5Value, callback) => {
       chunkList: chunkList
     };
   }
-  callback(result);
+  cb(result);
 };
 
 //check if file or folder exist
