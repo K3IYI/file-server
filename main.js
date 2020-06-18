@@ -18,7 +18,7 @@ const app = express();
 app.use(cors());
 
 //api to check is file exist
-app.get("/check/file", (req, resp) => {
+app.get("/check/file", (req, res) => {
   const query = req.query;
   const fileName = query.fileName;
   const fileMd5Value = query.fileMd5Value;
@@ -26,7 +26,7 @@ app.get("/check/file", (req, resp) => {
   //check is file exist
   //if no, return uploaded chunks if there is any
   isFileUploaded(fileName, fileMd5Value, data => {
-    resp.send(data);
+    res.send(data);
   });
 });
 
@@ -44,7 +44,7 @@ app.post("/upload/multer", (req, res) => {
 
 //api for upload with custom function
 //needs to call merge api after files being uploaded
-app.post("/upload", (req, resp) => {
+app.post("/upload", (req, res) => {
   //create a temporary directory to store uploaded file
   isFolderExist(path.resolve(uploadDir, "tmp"));
   const form = new formidable.IncomingForm({
@@ -67,13 +67,13 @@ app.post("/upload", (req, resp) => {
     moveFile(file.data.path, destFile).then(
       successLog => {
         console.log(successLog);
-        resp.send({
+        res.send({
           message: `chunk uploaded, current chunk number: ${chunkIndex}`
         });
       },
       errorLog => {
         console.log(errorLog);
-        resp.send({
+        res.send({
           error: `fail to upload chunk number: ${chunkIndex}`
         });
       }
@@ -82,7 +82,7 @@ app.post("/upload", (req, resp) => {
 });
 
 //api to merge uploaded file
-app.post("/merge", async (req, resp) => {
+app.post("/merge", async (req, res) => {
   const query = req.query;
   const fileMD5Value = query.fileMD5Value;
   const fileName = query.fileName;
@@ -90,7 +90,7 @@ app.post("/merge", async (req, resp) => {
 
   //merge file function
   await mergeFiles(fileMD5Value, fileName);
-  resp.send({
+  res.send({
     message: "Done merging"
   });
 });
