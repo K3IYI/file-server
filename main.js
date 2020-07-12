@@ -6,6 +6,7 @@ import {
   mergeFiles,
 } from "./upload/upload";
 import { upload, MulterError } from "./upload/simple-upload";
+import { fileComEnc, fileDecomDec } from "./com-enc/com-enc";
 
 //lib
 import express from "express";
@@ -21,9 +22,12 @@ app.use(bodyParser.json());
 
 app.use(cors());
 
+// fileComEnc();
+// fileDecomDec();
+
 //api for file downloading
 app.get("/download-file", (req, res) => {
-  res.status(200).download("./100mb.json");
+  res.status(200).download("./com-enc/test-com-enc.txt");
 });
 
 //api to test stream upload
