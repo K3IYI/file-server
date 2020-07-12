@@ -3,7 +3,7 @@ import {
   isFileUploaded,
   isFolderExist,
   moveFile,
-  mergeFiles
+  mergeFiles,
 } from "./upload/upload";
 import { upload, MulterError } from "./upload/simple-upload";
 
@@ -12,10 +12,21 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import formidable from "formidable";
+import bodyParser from "body-parser";
+import fs from "fs";
 
 const app = express();
 
+app.use(bodyParser.json());
+
 app.use(cors());
+
+//test api
+app.post("/stream-upload", (req, res) => {
+  const writeStream = fs.createWriteStream("./output");
+  req.pipe(writeStream);
+  res.status(200).send("ok");
+});
 
 //api to check is file exist
 app.get("/check/file", (req, res) => {
@@ -25,14 +36,14 @@ app.get("/check/file", (req, res) => {
 
   //check is file exist
   //if no, return uploaded chunks if there is any
-  isFileUploaded(fileName, fileMd5Value, data => {
+  isFileUploaded(fileName, fileMd5Value, (data) => {
     res.send(data);
   });
 });
 
 //api for upload using multer, no merge needed
 app.post("/upload/multer", (req, res) => {
-  upload(req, res, err => {
+  upload(req, res, (err) => {
     if (err instanceof MulterError) {
       return res.status(500).json(err);
     } else if (err) {
@@ -48,7 +59,7 @@ app.post("/upload", (req, res) => {
   //create a temporary directory to store uploaded file
   isFolderExist(path.resolve(uploadDir, "tmp"));
   const form = new formidable.IncomingForm({
-    uploadDir: path.resolve(uploadDir, "tmp")
+    uploadDir: path.resolve(uploadDir, "tmp"),
   });
 
   form.parse(req, async (err, fields, file) => {
@@ -65,16 +76,16 @@ app.post("/upload", (req, res) => {
     //move uploaded chunk from temporary folder to file folder
     //rename done within the function
     moveFile(file.data.path, destFile).then(
-      successLog => {
+      (successLog) => {
         console.log(successLog);
         res.send({
-          message: `chunk uploaded, current chunk number: ${chunkIndex}`
+          message: `chunk uploaded, current chunk number: ${chunkIndex}`,
         });
       },
-      errorLog => {
+      (errorLog) => {
         console.log(errorLog);
         res.send({
-          error: `fail to upload chunk number: ${chunkIndex}`
+          error: `fail to upload chunk number: ${chunkIndex}`,
         });
       }
     );
@@ -91,7 +102,7 @@ app.post("/merge", async (req, res) => {
   //merge file function
   await mergeFiles(fileMD5Value, fileName);
   res.send({
-    message: "Done merging"
+    message: "Done merging",
   });
 });
 
