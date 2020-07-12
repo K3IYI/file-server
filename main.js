@@ -21,7 +21,12 @@ app.use(bodyParser.json());
 
 app.use(cors());
 
-//test api
+//api for file downloading
+app.get("/download-file", (req, res) => {
+  res.status(200).download("./100mb.json");
+});
+
+//api to test stream upload
 app.post("/stream-upload", (req, res) => {
   const writeStream = fs.createWriteStream("./output");
   req.pipe(writeStream);
