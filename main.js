@@ -27,6 +27,7 @@ app.use(cors());
 
 //api for file downloading
 app.get("/download-file", (req, res) => {
+  // res.status(200).download("./com-enc/test.txt");
   res.status(200).download("./com-enc/test-com-enc.txt");
 });
 

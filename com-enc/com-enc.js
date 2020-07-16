@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 
 const appDir = path.dirname(require.main.filename);
-
+let authTag;
 export const fileComEnc = async () => {
   //compression stream
   const lz4Encoder = lz4.createEncoderStream();
@@ -25,27 +25,34 @@ export const fileComEnc = async () => {
   fs.createReadStream(appDir + "/com-enc/test.txt")
     .pipe(lz4Encoder)
     .pipe(cipher)
-    .pipe(fs.createWriteStream(appDir + "/com-enc/test-com-enc.txt"));
+    .pipe(fs.createWriteStream(appDir + "/com-enc/test-com-enc.txt"))
+    .on("close", () => {
+      authTag = cipher.getAuthTag();
+      console.log(authTag.toString("hex"));
+    });
 };
 
 export const fileDecomDec = async () => {
-  //compression stream
+  //decompression stream
   const lz4Decoder = lz4.createDecoderStream();
   lz4Decoder.on("error", (err) => {
     console.log("compression fail", err);
   });
 
-  //encryption stream
+  //deencryption stream
   const algorithm = "aes-256-gcm";
   const password = "Password used to generate key";
   const key = crypto.scryptSync(password, "salt", 32);
   const iv = Buffer.alloc(16, 0); // Initialization vector.
-  const Decipher = crypto.createDecipheriv(algorithm, key, iv);
-  Decipher.on("error", (err) => {
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  decipher.setAuthTag(
+    new Buffer.from("8c5e0d0731cc4a178ea1c87b2c782efc", "hex")
+  );
+  decipher.on("error", (err) => {
     console.log("encryption fail", err);
   });
   fs.createReadStream(appDir + "/com-enc/test-com-enc.txt")
-    .pipe(Decipher)
+    .pipe(decipher)
     .pipe(lz4Decoder)
-    .pipe(fs.createWriteStream(appDir + "/com-enc/test-deco-dec.txt"));
+    .pipe(fs.createWriteStream(appDir + "/com-enc/test-decom-dec.txt"));
 };
