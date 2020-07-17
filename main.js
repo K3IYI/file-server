@@ -68,11 +68,13 @@ app.post("/upload/multer", (req, res) => {
 app.post("/upload", (req, res) => {
   //create a temporary directory to store uploaded file
   isFolderExist(path.resolve(uploadDir, "tmp"));
-  const form = new formidable.IncomingForm({
+  const form = formidable({
+    // multiples: true,
     uploadDir: path.resolve(uploadDir, "tmp"),
   });
 
   form.parse(req, async (err, fields, file) => {
+    // console.log(files);
     const chunkIndex = fields.chunkIndex;
     const fileMD5Value = fields.fileMD5Value;
     const folder = path.resolve(uploadDir, fileMD5Value);
@@ -81,11 +83,11 @@ app.post("/upload", (req, res) => {
     //folder name is the MD5 value
     await isFolderExist(folder);
     const destFile = path.resolve(folder, chunkIndex);
-    console.log("----------->", file.data.path, destFile);
+    console.log("----------->", files.data.path, destFile);
 
     //move uploaded chunk from temporary folder to file folder
     //rename done within the function
-    moveFile(file.data.path, destFile).then(
+    moveFile(files.data.path, destFile).then(
       (successLog) => {
         console.log(successLog);
         res.send({
