@@ -83,11 +83,11 @@ app.post("/upload", (req, res) => {
     //folder name is the MD5 value
     await isFolderExist(folder);
     const destFile = path.resolve(folder, chunkIndex);
-    console.log("----------->", files.data.path, destFile);
+    console.log("----------->", file.data.path, destFile);
 
     //move uploaded chunk from temporary folder to file folder
     //rename done within the function
-    moveFile(files.data.path, destFile).then(
+    moveFile(file.data.path, destFile).then(
       (successLog) => {
         console.log(successLog);
         res.send({
