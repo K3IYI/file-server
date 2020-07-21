@@ -6,7 +6,6 @@ import {
   mergeFiles,
 } from "./upload/upload";
 import { upload, MulterError } from "./upload/simple-upload";
-import { fileComEnc, fileDecomDec } from "./com-enc/com-enc";
 
 //lib
 import express from "express";
@@ -18,23 +17,38 @@ import fs from "fs";
 
 const app = express();
 
+let tmpFormObj = {};
+
 app.use(bodyParser.json());
 
 app.use(cors({ exposedHeaders: ["Content-Disposition"] }));
 
-// fileComEnc();
-// fileDecomDec();
-
 //api for file downloading
 app.get("/download-file", (req, res) => {
-  res.status(200).download("./com-enc/test-com-enc.txt");
+  res.status(200).download("./public/uploaded");
 });
 
 //api to test stream upload
 app.post("/stream-upload", (req, res) => {
-  const writeStream = fs.createWriteStream("./output");
+  const writeStream = fs.createWriteStream("./public/uploaded");
   req.pipe(writeStream);
   res.status(200).send("ok");
+});
+
+//api to upload tmp form object
+app.post("/tmp-form-obj", (req, res) => {
+  const form = formidable();
+  form.parse(req, async (err, fields) => {
+    tmpFormObj.field1 = fields.field1;
+    tmpFormObj.field2 = fields.field2;
+    tmpFormObj.field3 = fields.field3;
+    res.status(200).send("ok");
+  });
+});
+
+//api to get tmp form object
+app.get("/tmp-form-obj", (req, res) => {
+  res.status(200).send(tmpFormObj);
 });
 
 //api to check is file exist
