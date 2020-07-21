@@ -20,14 +20,13 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.use(cors());
+app.use(cors({ exposedHeaders: ["Content-Disposition"] }));
 
 // fileComEnc();
 // fileDecomDec();
 
 //api for file downloading
 app.get("/download-file", (req, res) => {
-  // res.status(200).download("./com-enc/test.txt");
   res.status(200).download("./com-enc/test-com-enc.txt");
 });
 
