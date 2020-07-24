@@ -42,6 +42,7 @@ app.post("/tmp-form-obj", (req, res) => {
     tmpFormObj.field1 = fields.field1;
     tmpFormObj.field2 = fields.field2;
     tmpFormObj.field3 = fields.field3;
+    tmpFormObj.field4 = fields.field4;
     res.status(200).send("ok");
   });
 });
