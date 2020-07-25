@@ -21,7 +21,7 @@ let tmpFormObj = {};
 
 app.use(bodyParser.json());
 
-app.use(cors({ exposedHeaders: ["Content-Disposition"] }));
+app.use(cors({ exposedHeaders: ["Content-Disposition", ["Content-Range"]] }));
 
 //api for file downloading
 app.get("/download-file", (req, res) => {
