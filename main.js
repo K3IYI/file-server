@@ -17,9 +17,9 @@ import fs from "fs";
 import lz4 from "lz4";
 
 var encoder = lz4.createEncoderStream();
-var input = fs.createReadStream("test.txt");
-var output = fs.createWriteStream("test1");
-input.pipe(encoder).pipe(output);
+// var input = fs.createReadStream("test.txt");
+// var output = fs.createWriteStream("test1");
+// input.pipe(encoder).pipe(output);
 
 const app = express();
 
